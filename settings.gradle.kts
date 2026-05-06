@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "uds-windows-kotlin"
+
