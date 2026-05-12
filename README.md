@@ -56,7 +56,7 @@ http://opensource.org/licenses/MIT).
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:uds-windows-kotlin:0.1.0-SNAPSHOT")
+    implementation("io.github.kotlinmania:uds-windows-kotlin:0.1.0")
 }
 ```
 
