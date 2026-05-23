@@ -199,10 +199,18 @@ kotlin {
         binaries.framework { baseName = "UdsWindows"; xcf.add(this) }
     }
     iosSimulatorArm64 {
-        binaries.framework { baseName = "UdsWindows"; xcf.add(this) }
+        binaries.framework {
+            baseName = "UdsWindows"
+            isStatic = true
+            xcf.add(this)
+        }
     }
     iosX64 {
-        binaries.framework { baseName = "UdsWindows"; xcf.add(this) }
+        binaries.framework {
+            baseName = "UdsWindows"
+            isStatic = true
+            xcf.add(this)
+        }
     }
 
     tvosArm64 {
