@@ -4,6 +4,10 @@ package io.github.kotlinmania.udswindows.stdnet
 private const val SUN_PATH_LENGTH: Int = 108
 internal const val SUN_PATH_OFFSET: Int = 2
 
+// The submodule originally named `c` in the Rust source carries the FFI types
+// used by Winsock. ADDRESS_FAMILY is a 16-bit integer on Windows; AF_UNIX is
+// the literal Winsock address-family constant; sockaddr_un mirrors the C
+// layout that Winsock writes into.
 internal const val AF_UNIX: Int = 1
 
 internal class SockaddrUn(
@@ -32,6 +36,51 @@ internal fun sunPathOffset(addr: SockaddrUn): Int {
     require(addr.sunPath.size == SUN_PATH_LENGTH) { "sockaddr_un.sun_path must be $SUN_PATH_LENGTH bytes" }
     return SUN_PATH_OFFSET
 }
+
+/** Mirrors `std::io::Error`-from-`WSAGetLastError` semantics on Windows.
+ *  Carries the raw OS error code; constructed via [windowsSocketError]. */
+internal class WindowsSocketException(
+    val rawOsError: Int,
+    message: String = "Windows socket error: $rawOsError",
+) : RuntimeException(message)
+
+internal fun windowsSocketError(code: Int): WindowsSocketException = WindowsSocketException(code)
+
+/** Returns the last error from the Windows socket interface. The producer is
+ *  supplied by Windows-only callers; [defaultLastError] is the safe fallback
+ *  when no Winsock layer is wired into the current Kotlin target. */
+internal fun defaultLastError(): WindowsSocketException =
+    WindowsSocketException(-1, "Windows socket error: WSAGetLastError not available on this target")
+
+internal fun interface IsMinusOne<T> {
+    fun isMinusOne(value: T): Boolean
+}
+
+internal val ByteIsMinusOne: IsMinusOne<Byte> = IsMinusOne { it == (-1).toByte() }
+internal val ShortIsMinusOne: IsMinusOne<Short> = IsMinusOne { it == (-1).toShort() }
+internal val IntIsMinusOne: IsMinusOne<Int> = IsMinusOne { it == -1 }
+internal val LongIsMinusOne: IsMinusOne<Long> = IsMinusOne { it == -1L }
+
+/** Checks if the signed integer is the Windows constant `SOCKET_ERROR` (-1)
+ *  and if so, throws the error returned by [lastError]. This function must be
+ *  called before another call to the socket API is made. */
+internal inline fun <T> cvt(
+    t: T,
+    isMinusOne: IsMinusOne<T>,
+    lastError: () -> Throwable = ::defaultLastError,
+): T = if (isMinusOne.isMinusOne(t)) throw lastError() else t
+
+internal fun cvt(t: Byte, lastError: () -> Throwable = ::defaultLastError): Byte =
+    cvt(t, ByteIsMinusOne, lastError)
+
+internal fun cvt(t: Short, lastError: () -> Throwable = ::defaultLastError): Short =
+    cvt(t, ShortIsMinusOne, lastError)
+
+internal fun cvt(t: Int, lastError: () -> Throwable = ::defaultLastError): Int =
+    cvt(t, IntIsMinusOne, lastError)
+
+internal fun cvt(t: Long, lastError: () -> Throwable = ::defaultLastError): Long =
+    cvt(t, LongIsMinusOne, lastError)
 
 internal fun sockaddrUn(path: String): Pair<SockaddrUn, Int> {
     require(path.none { it == '\u0000' }) { "paths may not contain interior null bytes" }
@@ -171,5 +220,10 @@ private fun ByteArray.firstNullIndex(): Int {
     return -1
 }
 
-// This upstream module also exposes extension-buffer and socket wrapper types
-// that live in sibling source files.
+// Upstream re-exports the following symbols from sibling source files:
+//
+//   pub use self::ext::{AcceptAddrs, AcceptAddrsBuf, UnixListenerExt, UnixStreamExt};
+//   pub use self::net::{UnixListener, UnixStream};
+//
+// Per the workspace re-export rule those symbols are reached via their
+// originating Kotlin sources (Ext.kt, Net.kt) rather than aliased here.
