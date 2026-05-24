@@ -196,7 +196,11 @@ kotlin {
         binaries.framework { baseName = "UdsWindows"; xcf.add(this) }
     }
     iosArm64 {
-        binaries.framework { baseName = "UdsWindows"; xcf.add(this) }
+        binaries.framework {
+            baseName = "UdsWindows"
+            isStatic = true
+            xcf.add(this)
+        }
     }
     iosSimulatorArm64 {
         binaries.framework {
