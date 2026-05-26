@@ -5,9 +5,9 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 2/5 (40.0%)
-- **Function parity:** 8/106 matched (target 25) — 7.5%
-- **Class/type parity:** 4/21 matched (target 8) — 19.0%
-- **Combined symbol parity:** 12/127 matched (target 33) — 9.4%
+- **Function parity:** 9/106 matched (target 35) — 8.5%
+- **Class/type parity:** 4/21 matched (target 9) — 19.0%
+- **Combined symbol parity:** 13/127 matched (target 44) — 10.2%
 - **Average inline-code cosine:** 0.00 (function body across 0 matched files)
 - **Average documentation cosine:** 0.00 (doc text across 0 matched files)
 - **Cheat-zeroed Files:** 1
@@ -29,13 +29,13 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 1. stdnet.mod
 
-- **Target:** `stdnet.Mod [STUB]`
+- **Target:** `stdnet.SocketAddr [STUB]`
 - **Similarity:** 0.00
 - **Dependents:** 0
-- **Priority Score:** 61810.0
-- **Functions:** 8/13 matched (target 25)
-- **Missing functions:** `fmt`, `last_error`, `cvt`, `new`, `eq`
-- **Types:** 4/5 matched (target 8)
+- **Priority Score:** 51810.0
+- **Functions:** 9/13 matched (target 35)
+- **Missing functions:** `fmt`, `last_error`, `new`, `eq`
+- **Types:** 4/5 matched (target 9)
 - **Missing types:** `IsMinusOne`
 
 ### 2. lib

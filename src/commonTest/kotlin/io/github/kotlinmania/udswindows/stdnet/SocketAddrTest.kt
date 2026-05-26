@@ -51,4 +51,33 @@ class SocketAddrTest {
 
         assertEquals("path must be shorter than SUN_LEN", error.message)
     }
+
+    @Test
+    fun isMinusOneDetectsSocketError() {
+        assertTrue(ByteIsMinusOne.isMinusOne((-1).toByte()))
+        assertTrue(ShortIsMinusOne.isMinusOne((-1).toShort()))
+        assertTrue(IntIsMinusOne.isMinusOne(-1))
+        assertTrue(LongIsMinusOne.isMinusOne(-1L))
+
+        assertFalse(ByteIsMinusOne.isMinusOne(0.toByte()))
+        assertFalse(IntIsMinusOne.isMinusOne(0))
+        assertFalse(LongIsMinusOne.isMinusOne(0xFFFFFFFFL))
+    }
+
+    @Test
+    fun cvtPassesThroughOnSuccess() {
+        assertEquals(42, cvt(42))
+        assertEquals(0, cvt(0))
+        assertEquals(0xFFFFFFFFL, cvt(0xFFFFFFFFL))
+    }
+
+    @Test
+    fun cvtThrowsOnSocketError() {
+        val custom = WindowsSocketException(10038, "WSAENOTSOCK")
+        val thrown = assertFailsWith<WindowsSocketException> { cvt(-1) { custom } }
+        assertEquals(10038, thrown.rawOsError)
+
+        val defaultThrown = assertFailsWith<WindowsSocketException> { cvt(-1) }
+        assertEquals(-1, defaultThrown.rawOsError)
+    }
 }
