@@ -36,18 +36,20 @@ class SocketAddrTest {
 
     @Test
     fun interiorNullBytesAreRejected() {
-        val error = assertFailsWith<IllegalArgumentException> {
-            fromPath("bad\u0000path")
-        }
+        val error =
+            assertFailsWith<IllegalArgumentException> {
+                fromPath("bad\u0000path")
+            }
 
         assertEquals("paths may not contain interior null bytes", error.message)
     }
 
     @Test
     fun sunPathLengthMustLeaveRoomForNullTerminator() {
-        val error = assertFailsWith<IllegalArgumentException> {
-            fromPath("a".repeat(108))
-        }
+        val error =
+            assertFailsWith<IllegalArgumentException> {
+                fromPath("a".repeat(108))
+            }
 
         assertEquals("path must be shorter than SUN_LEN", error.message)
     }

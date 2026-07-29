@@ -8,3 +8,5 @@ package io.github.kotlinmania.udswindows
 // this file records that crate-root wiring without adding central alias APIs.
 // The re-exported upstream names are fromPath, AcceptAddrs, AcceptAddrsBuf,
 // SocketAddr, UnixListener, UnixListenerExt, UnixStream, and UnixStreamExt.
+
+internal object UdsWindowsLib
