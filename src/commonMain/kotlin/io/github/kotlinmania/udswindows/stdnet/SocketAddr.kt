@@ -95,9 +95,13 @@ internal fun sockaddrUn(path: String): Pair<SockaddrUn, Int> {
 internal sealed class AddressKind {
     data object Unnamed : AddressKind()
 
-    data class Pathname(val path: String) : AddressKind()
+    data class Pathname(
+        val path: String,
+    ) : AddressKind()
 
-    class Abstract(name: ByteArray) : AddressKind() {
+    class Abstract(
+        name: ByteArray,
+    ) : AddressKind() {
         val name: ByteArray = name.copyOf()
 
         override fun equals(other: Any?): Boolean =
@@ -183,7 +187,9 @@ fun fromPath(path: String): SocketAddr {
     return SocketAddr.fromParts(addr, len)
 }
 
-private class AsciiEscaped(private val bytes: ByteArray) {
+private class AsciiEscaped(
+    private val bytes: ByteArray,
+) {
     override fun toString(): String =
         buildString {
             append('"')
