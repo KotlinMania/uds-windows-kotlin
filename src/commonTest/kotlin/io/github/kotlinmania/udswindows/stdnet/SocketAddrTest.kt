@@ -1,4 +1,4 @@
-// port-lint: source stdnet/mod.rs
+// port-lint: tests stdnet/mod.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 import kotlin.test.Test
@@ -56,14 +56,14 @@ class SocketAddrTest {
 
     @Test
     fun isMinusOneDetectsSocketError() {
-        assertTrue(ByteIsMinusOne.isMinusOne((-1).toByte()))
-        assertTrue(ShortIsMinusOne.isMinusOne((-1).toShort()))
-        assertTrue(IntIsMinusOne.isMinusOne(-1))
-        assertTrue(LongIsMinusOne.isMinusOne(-1L))
+        assertTrue((-1).toByte().isMinusOne())
+        assertTrue((-1).toShort().isMinusOne())
+        assertTrue((-1).isMinusOne())
+        assertTrue((-1L).isMinusOne())
 
-        assertFalse(ByteIsMinusOne.isMinusOne(0.toByte()))
-        assertFalse(IntIsMinusOne.isMinusOne(0))
-        assertFalse(LongIsMinusOne.isMinusOne(0xFFFFFFFFL))
+        assertFalse(0.toByte().isMinusOne())
+        assertFalse(0.isMinusOne())
+        assertFalse(0xFFFFFFFFL.isMinusOne())
     }
 
     @Test
@@ -75,11 +75,7 @@ class SocketAddrTest {
 
     @Test
     fun cvtThrowsOnSocketError() {
-        val custom = WindowsSocketException(10038, "WSAENOTSOCK")
-        val thrown = assertFailsWith<WindowsSocketException> { cvt(-1) { custom } }
-        assertEquals(10038, thrown.rawOsError)
-
-        val defaultThrown = assertFailsWith<WindowsSocketException> { cvt(-1) }
-        assertEquals(-1, defaultThrown.rawOsError)
+        val thrown = assertFailsWith<WindowsSocketException> { cvt(-1) }
+        assertEquals(-1, thrown.rawOsError)
     }
 }
