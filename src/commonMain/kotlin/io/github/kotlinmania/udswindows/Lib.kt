@@ -9,4 +9,10 @@ package io.github.kotlinmania.udswindows
 // The re-exported upstream names are fromPath, AcceptAddrs, AcceptAddrsBuf,
 // SocketAddr, UnixListener, UnixListenerExt, UnixStream, and UnixStreamExt.
 
-internal object UdsWindowsLib
+/**
+ * Module descriptor for the root uds_windows crate.
+ */
+public object UdsWindowsLib {
+    public const val MODULE_NAME: String = "uds_windows"
+    public const val CRATE_NAME: String = "uds_windows"
+}
