@@ -599,7 +599,14 @@ if (benchmarkEnabled) {
 tasks.named("check") {
     dependsOn(tasks.withType<io.gitlab.arturbosch.detekt.Detekt>())
     dependsOn(tasks.named("ktlintCheck"))
-    dependsOn("test")
+    // Android host unit tests run here alongside the tests that check -> allTests
+    // already executes (jvm, macosArm64, the Apple simulators, js, wasmJs,
+    // wasmWasi). Test EXECUTION belongs to check; target BUILD coverage belongs
+    // to the explicit all-target build set below.
+    dependsOn("testAndroidHostTest")
+    dependsOn("hostTests")
+    // Swift Export smoke test is required; it must not self-skip.
+    dependsOn("swiftExportSmokeTest")
 }
 
 // ============================================================================
@@ -703,17 +710,6 @@ mavenPublishing {
 // Tasks
 // ============================================================================
 
-// Exact test lifecycle task. Without this, ./gradlew test is ambiguous between
-// Android test task names. This runs commonTest through the KMP allTests
-// lifecycle and adds the Android host + Swift Export parity tests.
-tasks.register("test") {
-    group = "verification"
-    description = "Runs the commonTest-backed KMP suite, Android host tests, and Swift Export smoke test."
-    dependsOn("allTests")
-    dependsOn("testAndroidHostTest")
-    dependsOn("swiftExportSmokeTest")
-}
-
 tasks.register("setupAndroidSdk") {
     group = "setup"
     description = "Downloads and configures the project-local Android SDK. (Alias for ensureAndroidSdk)"
@@ -736,6 +732,50 @@ tasks.register("hostTests") {
     )
 }
 
+// Patch generated SPM package for macOS platform and Swift fixes
+tasks.matching { it.name.contains("GenerateSPMPackage") }.configureEach {
+    doLast {
+        val spmDir =
+            layout.buildDirectory
+                .dir("SPMPackage")
+                .orNull
+                ?.asFile
+        if (spmDir != null && spmDir.exists()) {
+            spmDir.walkTopDown().forEach { file ->
+                if (file.name == "Package.swift") {
+                    val text = file.readText()
+                    if (!text.contains("platforms:")) {
+                        file.writeText(
+                            text.replaceFirst(
+                                Regex("""(let package = Package\s*\(\s*name:\s*"[^"]*",)"""),
+                                "$1\n    platforms: [.macOS(.v14)],",
+                            ),
+                        )
+                    }
+                } else if (file.extension == "swift") {
+                    var text = file.readText()
+                    var modified = false
+                    if (text.contains("String(reflecting:")) {
+                        text = text.replace("String(reflecting:", "Swift.String(reflecting:")
+                        modified = true
+                    }
+                    if (text.contains("case let res: { let _ref = res;")) {
+                        text = text.replace("case let res: { let _ref = res;", "case let res?: { let _ref = res;")
+                        modified = true
+                    }
+                    if (text.contains("case nil: .none; case let res:")) {
+                        text = text.replace("case nil: .none; case let res:", "case nil: nil; case let res?:")
+                        modified = true
+                    }
+                    if (modified) {
+                        file.writeText(text)
+                    }
+                }
+            }
+        }
+    }
+}
+
 // Swift Export smoke test — produces the SPM package via embedSwiftExportForXcode
 // (spawned with the Xcode-style env it requires) and runs `swift test` against it,
 // so Swift Export breakage surfaces locally, not only in the swift.yml CI job.
@@ -753,6 +793,7 @@ tasks.register("swiftExportSmokeTest") {
                 .dir("swift-test")
                 .get()
                 .asFile
+                .apply { mkdirs() }
                 .absolutePath
         execOperations
             .exec {
@@ -774,6 +815,7 @@ tasks.register("swiftExportSmokeTest") {
                         "FRAMEWORKS_FOLDER_PATH" to "Frameworks",
                         "MACOSX_DEPLOYMENT_TARGET" to "14.0",
                         "DEPLOYMENT_TARGET_SETTING_NAME" to "MACOSX_DEPLOYMENT_TARGET",
+                        "ENABLE_USER_SCRIPT_SANDBOXING" to "NO",
                     ),
                 )
             }.assertNormalExitValue()
@@ -788,7 +830,7 @@ tasks.register("swiftExportSmokeTest") {
             if (!text.contains("platforms:")) {
                 generatedPackageSwift.writeText(
                     text.replaceFirst(
-                        Regex("(name:\\s*\"[^\"]*\",)"),
+                        Regex("(Package\\(\\s*name:\\s*\"[^\"]*\",)"),
                         "\$1\n    platforms: [.macOS(.v14)],",
                     ),
                 )
@@ -867,4 +909,10 @@ val fullTargetBuildTaskNames =
 
 tasks.named("build") {
     dependsOn(fullTargetBuildTaskNames)
+}
+
+tasks.register("test") {
+    group = "verification"
+    description = "Runs all unit tests on host targets and the Swift test harness."
+    dependsOn("hostTests", "swiftExportSmokeTest")
 }
