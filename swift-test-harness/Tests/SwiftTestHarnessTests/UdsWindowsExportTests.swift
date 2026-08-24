@@ -1,17 +1,17 @@
-#if canImport(Testing)
 import Testing
 import UdsWindows
 
-@Test func swiftModuleLoads() {
-    #expect(true)
-}
-#elseif canImport(XCTest)
-import XCTest
-import UdsWindows
+@Suite("UdsWindows Swift Export Suite")
+struct UdsWindowsExportTests {
+    @Test("Swift module loads cleanly")
+    func swiftModuleLoads() {
+        #expect(Bool(true), "UdsWindows swift module imported cleanly")
+    }
 
-final class UdsWindowsExportTests: XCTestCase {
-    func testSwiftModuleLoads() throws {
-        XCTAssertTrue(true, "UdsWindows swift module imported cleanly")
+    @Test("SocketAddr pathname works")
+    func socketAddrWorks() {
+        let addr = stdnet.fromPath(path: "/tmp/sock")
+        #expect(addr.asPathname() == "/tmp/sock")
+        #expect(!addr.isUnnamed())
     }
 }
-#endif
