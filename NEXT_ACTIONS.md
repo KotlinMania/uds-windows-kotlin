@@ -29,7 +29,7 @@ Every matched file is listed below with function and type symbol parity.
 
 ### 1. stdnet.ext
 
-- **Target:** `stdnet.Ext`
+- **Target:** `stdnet.Ext [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.08
 - **Dependents:** 0
 - **Priority Score:** 212909.2
@@ -37,10 +37,13 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `fmt`, `last_err`, `cvt`, `socket_addr_to_ptrs`, `ptrs_to_socket_addr`, `slice2buf`, `result`, `read_overlapped`, `write_overlapped`, `connect_overlapped`, `connect_complete`, `accept_overlapped`, `accept_complete`, `default`, `args`, `get`
 - **Types:** 4/9 matched (target 4)
 - **Missing types:** `WsaExtension`, `NetInt`, `ConnectEx`, `AcceptEx`, `GetAcceptExSockaddrs`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `stdnet/ext.rs` vs expected `stdnet/ext.rs`
+- **Proposed provenance header:** `// port-lint: source stdnet/ext.rs` (current: `// port-lint: source stdnet/ext.rs`)
+- **Lint issues:** 1
 
 ### 2. stdnet.socket
 
-- **Target:** `stdnet.Socket`
+- **Target:** `stdnet.Socket [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.15
 - **Dependents:** 0
 - **Priority Score:** 152508.5
@@ -48,11 +51,13 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `cvt_z`, `accept`, `recv_with_flags`, `read`, `write`, `set_no_inherit`, `setsockopt`, `getsockopt`, `drop`, `as_raw_socket`, `from_raw_socket`, `into_raw_socket`, `as_socket`, `from`
 - **Types:** 1/2 matched
 - **Missing types:** `IsZero`
-- **Lint issues:** 1
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `stdnet/socket.rs` vs expected `stdnet/socket.rs`
+- **Proposed provenance header:** `// port-lint: source stdnet/socket.rs` (current: `// port-lint: source stdnet/socket.rs`)
+- **Lint issues:** 2
 
 ### 3. stdnet.net
 
-- **Target:** `stdnet.Net`
+- **Target:** `stdnet.Net [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.34
 - **Dependents:** 0
 - **Priority Score:** 123706.6
@@ -61,10 +66,15 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 3/5 matched (target 8)
 - **Missing types:** `Item`, `IntoIter`
 - **Tests:** 4/5 matched
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `stdnet/net.rs` vs expected `stdnet/net.rs`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:stdnet/net.rs` vs expected `stdnet/net.rs`
+- **Proposed provenance header:** `// port-lint: source stdnet/net.rs` (current: `// port-lint: source stdnet/net.rs`)
+- **Proposed provenance header:** `// port-lint: tests stdnet/net.rs` (current: `// port-lint: tests stdnet/net.rs`)
+- **Lint issues:** 2
 
 ### 4. stdnet.mod
 
-- **Target:** `stdnet.Mod [STUB]`
+- **Target:** `stdnet.Mod [STUB] [PROVENANCE-FALLBACK]`
 - **Similarity:** 0.00
 - **Dependents:** 0
 - **Priority Score:** 21810.0
@@ -72,10 +82,15 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** `fmt`, `eq`
 - **Types:** 5/5 matched (target 11)
 - **Missing types:** _none_
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `stdnet/mod.rs` vs expected `stdnet/mod.rs`
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `tests:stdnet/mod.rs` vs expected `stdnet/mod.rs`
+- **Proposed provenance header:** `// port-lint: source stdnet/mod.rs` (current: `// port-lint: source stdnet/mod.rs`)
+- **Proposed provenance header:** `// port-lint: tests stdnet/mod.rs` (current: `// port-lint: tests stdnet/mod.rs`)
+- **Lint issues:** 2
 
 ### 5. lib
 
-- **Target:** `udswindows.Lib`
+- **Target:** `udswindows.Lib [PROVENANCE-FALLBACK]`
 - **Similarity:** 1.00
 - **Dependents:** 0
 - **Priority Score:** 0.0
@@ -83,6 +98,9 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 8)
 - **Missing types:** _none_
+- **Provenance warning:** port-lint provenance header matched only after fallback normalization: `lib.rs` vs expected `lib.rs`
+- **Proposed provenance header:** `// port-lint: source lib.rs` (current: `// port-lint: source lib.rs`)
+- **Lint issues:** 1
 
 ## Success Criteria
 
