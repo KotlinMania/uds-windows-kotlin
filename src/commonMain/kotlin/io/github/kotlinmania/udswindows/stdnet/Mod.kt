@@ -34,8 +34,13 @@ internal fun sunPathOffset(addr: SockaddrUn): Int {
 }
 
 /** Carries a raw Windows socket error code. */
-internal class WindowsSocketException(
+public data class SocketError(
     val rawOsError: Int,
+    val message: String = "Windows socket error: $rawOsError",
+)
+
+public class WindowsSocketException(
+    public val rawOsError: Int,
     message: String = "Windows socket error: $rawOsError",
 ) : RuntimeException(message)
 

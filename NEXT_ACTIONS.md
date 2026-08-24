@@ -4,14 +4,14 @@ Based on AST analysis, here are the concrete next steps.
 
 ## Summary
 
-- **Files Present:** 2/5 (40.0%)
-- **Function parity:** 11/106 matched (target 39) — 10.4%
-- **Class/type parity:** 5/21 matched (target 11) — 23.8%
-- **Combined symbol parity:** 16/127 matched (target 50) — 12.6%
-- **Average inline-code cosine:** 1.00 (function body across 1 matched files)
-- **Average documentation cosine:** 1.00 (doc text across 1 matched files)
+- **Files Present:** 5/5 (100.0%)
+- **Function parity:** 46/88 matched (target 100) — 52.3%
+- **Class/type parity:** 13/21 matched (target 33) — 61.9%
+- **Combined symbol parity:** 59/109 matched (target 133) — 54.1%
+- **Average inline-code cosine:** 0.39 (function body across 4 matched files)
+- **Average documentation cosine:** 0.34 (doc text across 4 matched files)
 - **Cheat-zeroed Files:** 1
-- **Critical Issues:** 1 files with <0.60 function similarity
+- **Critical Issues:** 4 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -27,18 +27,53 @@ No missing high-value files detected.
 
 Every matched file is listed below with function and type symbol parity.
 
-### 1. stdnet.mod
+### 1. stdnet.ext
+
+- **Target:** `stdnet.Ext`
+- **Similarity:** 0.08
+- **Dependents:** 0
+- **Priority Score:** 212909.2
+- **Functions:** 4/20 matched (target 4)
+- **Missing functions:** `fmt`, `last_err`, `cvt`, `socket_addr_to_ptrs`, `ptrs_to_socket_addr`, `slice2buf`, `result`, `read_overlapped`, `write_overlapped`, `connect_overlapped`, `connect_complete`, `accept_overlapped`, `accept_complete`, `default`, `args`, `get`
+- **Types:** 4/9 matched (target 4)
+- **Missing types:** `WsaExtension`, `NetInt`, `ConnectEx`, `AcceptEx`, `GetAcceptExSockaddrs`
+
+### 2. stdnet.socket
+
+- **Target:** `stdnet.Socket`
+- **Similarity:** 0.15
+- **Dependents:** 0
+- **Priority Score:** 152508.5
+- **Functions:** 9/23 matched (target 12)
+- **Missing functions:** `cvt_z`, `accept`, `recv_with_flags`, `read`, `write`, `set_no_inherit`, `setsockopt`, `getsockopt`, `drop`, `as_raw_socket`, `from_raw_socket`, `into_raw_socket`, `as_socket`, `from`
+- **Types:** 1/2 matched
+- **Missing types:** `IsZero`
+- **Lint issues:** 1
+
+### 3. stdnet.net
+
+- **Target:** `stdnet.Net`
+- **Similarity:** 0.34
+- **Dependents:** 0
+- **Priority Score:** 123706.6
+- **Functions:** 22/32 matched (target 46)
+- **Missing functions:** `fmt`, `inner`, `flush`, `as_socket`, `as_raw_socket`, `from_raw_socket`, `into_raw_socket`, `into_iter`, `size_hint`, `tmpdir`
+- **Types:** 3/5 matched (target 8)
+- **Missing types:** `Item`, `IntoIter`
+- **Tests:** 4/5 matched
+
+### 4. stdnet.mod
 
 - **Target:** `stdnet.Mod [STUB]`
 - **Similarity:** 0.00
 - **Dependents:** 0
 - **Priority Score:** 21810.0
-- **Functions:** 11/13 matched (target 39)
+- **Functions:** 11/13 matched (target 38)
 - **Missing functions:** `fmt`, `eq`
-- **Types:** 5/5 matched (target 10)
+- **Types:** 5/5 matched (target 11)
 - **Missing types:** _none_
 
-### 2. lib
+### 5. lib
 
 - **Target:** `udswindows.Lib`
 - **Similarity:** 1.00
@@ -46,7 +81,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Priority Score:** 0.0
 - **Functions:** 0/0 matched
 - **Missing functions:** _none_
-- **Types:** 0/0 matched (target 1)
+- **Types:** 0/0 matched (target 8)
 - **Missing types:** _none_
 
 ## Success Criteria
