@@ -1,6 +1,6 @@
 # port-lint Proposed Changes
 
-**Generated:** 2026-08-23
+**Generated:** 2026-08-24
 **Source:** tmp/uds_windows/src
 **Target:** src/commonMain/kotlin
 
