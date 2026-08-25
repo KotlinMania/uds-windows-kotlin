@@ -53,9 +53,9 @@ Every matched file is listed below with function and type symbol parity.
 ### 3. stdnet.net
 
 - **Target:** `stdnet.Net`
-- **Similarity:** 0.34
+- **Similarity:** 0.33
 - **Dependents:** 0
-- **Priority Score:** 123706.6
+- **Priority Score:** 123706.7
 - **Functions:** 22/32 matched (target 46)
 - **Missing functions:** `fmt`, `inner`, `flush`, `as_socket`, `as_raw_socket`, `from_raw_socket`, `into_raw_socket`, `into_iter`, `size_hint`, `tmpdir`
 - **Types:** 3/5 matched (target 8)
