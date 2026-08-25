@@ -269,7 +269,10 @@ public class Incoming(
     Sequence<AcceptedConnection> {
     override fun hasNext(): Boolean = true
 
-    override fun next(): AcceptedConnection = listener.accept()
+    override fun next(): AcceptedConnection {
+        if (!hasNext()) throw NoSuchElementException("No more incoming connections")
+        return listener.accept()
+    }
 
     override fun iterator(): Iterator<AcceptedConnection> = this
 }
