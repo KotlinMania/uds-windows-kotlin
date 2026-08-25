@@ -112,6 +112,8 @@ class NetTest {
         }
     }
 
+    private fun tmpdir(): String = "/tmp/test_sock_${randomSuffix()}"
+
     private fun randomSuffix(): String =
         (1..100000).random().toString()
 }
