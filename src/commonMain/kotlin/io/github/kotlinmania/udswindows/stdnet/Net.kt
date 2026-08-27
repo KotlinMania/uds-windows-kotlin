@@ -1,4 +1,4 @@
-// port-lint: source stdnet/net.rs
+// port-lint: source uds_windows/src/stdnet/net.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 public class AcceptedConnection(

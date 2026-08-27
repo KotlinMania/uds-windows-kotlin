@@ -1,4 +1,4 @@
-// port-lint: source stdnet/mod.rs
+// port-lint: source uds_windows/src/stdnet/mod.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 private const val SUN_PATH_LENGTH: Int = 108
