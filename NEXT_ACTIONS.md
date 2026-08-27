@@ -8,10 +8,10 @@ Based on AST analysis, here are the concrete next steps.
 - **Function parity:** 46/88 matched (target 103) — 52.3%
 - **Class/type parity:** 13/21 matched (target 34) — 61.9%
 - **Combined symbol parity:** 59/109 matched (target 137) — 54.1%
-- **Average inline-code cosine:** 0.19 (function body across 3 matched files)
-- **Average documentation cosine:** 0.13 (doc text across 3 matched files)
-- **Cheat-zeroed Files:** 2
-- **Critical Issues:** 5 files with <0.60 function similarity
+- **Average inline-code cosine:** 0.39 (function body across 4 matched files)
+- **Average documentation cosine:** 0.34 (doc text across 4 matched files)
+- **Cheat-zeroed Files:** 1
+- **Critical Issues:** 4 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -73,12 +73,12 @@ Every matched file is listed below with function and type symbol parity.
 - **Types:** 5/5 matched (target 12)
 - **Missing types:** _none_
 
-### 5. uds_windows.lib
+### 5. lib
 
-- **Target:** `udswindows.Lib [STUB]`
-- **Similarity:** 0.00
+- **Target:** `udswindows.Lib`
+- **Similarity:** 1.00
 - **Dependents:** 0
-- **Priority Score:** 10.0
+- **Priority Score:** 0.0
 - **Functions:** 0/0 matched
 - **Missing functions:** _none_
 - **Types:** 0/0 matched (target 8)
