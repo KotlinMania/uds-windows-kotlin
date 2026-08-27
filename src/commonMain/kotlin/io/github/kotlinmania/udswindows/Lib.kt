@@ -1,4 +1,4 @@
-// port-lint: source uds_windows/src/lib.rs
+// port-lint: source lib.rs
 package io.github.kotlinmania.udswindows
 
 public typealias SocketAddr = io.github.kotlinmania.udswindows.stdnet.SocketAddr
