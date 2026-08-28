@@ -5,12 +5,12 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 5/5 (100.0%)
-- **Function parity:** 46/88 matched (target 103) — 52.3%
-- **Class/type parity:** 13/21 matched (target 34) — 61.9%
-- **Combined symbol parity:** 59/109 matched (target 137) — 54.1%
+- **Function parity:** 35/75 matched (target 63) — 46.7%
+- **Class/type parity:** 8/16 matched (target 22) — 50.0%
+- **Combined symbol parity:** 43/91 matched (target 85) — 47.3%
 - **Average inline-code cosine:** 0.39 (function body across 4 matched files)
 - **Average documentation cosine:** 0.34 (doc text across 4 matched files)
-- **Cheat-zeroed Files:** 1
+- **Cheat-zeroed Files:** 0
 - **Critical Issues:** 4 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
@@ -62,18 +62,7 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** `Item`, `IntoIter`
 - **Tests:** 4/5 matched
 
-### 4. stdnet.mod
-
-- **Target:** `stdnet.Mod [STUB]`
-- **Similarity:** 0.00
-- **Dependents:** 0
-- **Priority Score:** 21810.0
-- **Functions:** 11/13 matched (target 40)
-- **Missing functions:** `fmt`, `eq`
-- **Types:** 5/5 matched (target 12)
-- **Missing types:** _none_
-
-### 5. lib
+### 4. lib
 
 - **Target:** `udswindows.Lib`
 - **Similarity:** 1.00
@@ -92,4 +81,17 @@ For each file to be considered "complete":
 - All tests ported
 - Documentation ported
 - port-lint header present
+
+## Reexport / Wiring Modules
+
+These files match `reexport_modules` patterns in `.ast_distance_config.json`. They are filtered out of
+normal priority and missing-file ladders because they are wiring
+modules, not direct logic ports. Consult them for call-site routing;
+do not treat them as the next implementation target by default.
+
+### Matched
+
+| Source | Target | Path |
+|--------|--------|------|
+| `stdnet.mod` | `stdnet.Mod` | `stdnet/mod` |
 
