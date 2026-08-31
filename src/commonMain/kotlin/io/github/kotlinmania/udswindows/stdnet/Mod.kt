@@ -1,4 +1,4 @@
-// port-lint: source stdnet/mod.rs
+// port-lint: source uds_windows/src/stdnet/mod.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 internal const val AF_UNIX: Int = 1

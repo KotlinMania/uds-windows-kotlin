@@ -1,4 +1,4 @@
-// port-lint: source stdnet/socket.rs
+// port-lint: source uds_windows/src/stdnet/socket.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 public const val WSA_FLAG_OVERLAPPED: Int = 0x01
