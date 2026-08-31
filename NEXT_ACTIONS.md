@@ -5,13 +5,13 @@ Based on AST analysis, here are the concrete next steps.
 ## Summary
 
 - **Files Present:** 5/5 (100.0%)
-- **Function parity:** 35/75 matched (target 63) — 46.7%
-- **Class/type parity:** 8/16 matched (target 14) — 50.0%
-- **Combined symbol parity:** 43/91 matched (target 77) — 47.3%
-- **Average inline-code cosine:** 0.39 (function body across 4 matched files)
-- **Average documentation cosine:** 0.34 (doc text across 4 matched files)
-- **Cheat-zeroed Files:** 0
-- **Critical Issues:** 4 files with <0.60 function similarity
+- **Function parity:** 46/88 matched (target 92) — 52.3%
+- **Class/type parity:** 13/21 matched (target 24) — 61.9%
+- **Combined symbol parity:** 59/109 matched (target 116) — 54.1%
+- **Average inline-code cosine:** 0.19 (function body across 3 matched files)
+- **Average documentation cosine:** 0.13 (doc text across 3 matched files)
+- **Cheat-zeroed Files:** 1
+- **Critical Issues:** 5 files with <0.60 function similarity
 
 ## Priority 1: Fix Incomplete High-Dependency Files
 
@@ -62,6 +62,18 @@ Every matched file is listed below with function and type symbol parity.
 - **Missing types:** `Item`, `IntoIter`
 - **Tests:** 4/5 matched
 
+### 4. stdnet.mod
+
+- **Target:** `stdnet.Mod [STUB]`
+- **Similarity:** 0.00
+- **Dependents:** 0
+- **Priority Score:** 21810.0
+- **Functions:** 11/13 matched (target 29)
+- **Missing functions:** `fmt`, `eq`
+- **Types:** 5/5 matched (target 10)
+- **Missing types:** _none_
+- **Lint issues:** 1
+
 ## Success Criteria
 
 For each file to be considered "complete":
@@ -82,6 +94,5 @@ do not treat them as the next implementation target by default.
 
 | Source | Target | Path |
 |--------|--------|------|
-| `stdnet.mod` | `stdnet.Mod` | `stdnet/mod` |
-| `lib` | `udswindows.Lib` | `lib` |
+| `uds_windows.lib` | `udswindows.Lib` | `uds_windows/src/lib` |
 
