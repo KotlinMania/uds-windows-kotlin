@@ -1,4 +1,4 @@
-// port-lint: source stdnet/ext.rs
+// port-lint: source uds_windows/src/stdnet/ext.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 public class AcceptAddrsBuf {
