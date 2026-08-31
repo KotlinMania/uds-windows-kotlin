@@ -1,4 +1,4 @@
-// port-lint: source uds_windows/src/stdnet/socket.rs
+// port-lint: source stdnet/socket.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 public const val WSA_FLAG_OVERLAPPED: Int = 0x01
@@ -39,13 +39,17 @@ public class Socket internal constructor(
         this.nonblocking = nonblocking
     }
 
-    public fun isNonblocking(): Boolean = nonblocking
+    public fun isNonblocking(): Boolean {
+        return nonblocking
+    }
 
     public fun shutdown(how: Shutdown) {
         check(!isClosed) { "cannot shutdown a closed socket" }
     }
 
-    public fun takeError(): SocketError? = null
+    public fun takeError(): SocketError? {
+        return null
+    }
 
     public fun setTimeout(durationMs: Long?, kind: Int) {
         if (durationMs != null && durationMs <= 0) {
@@ -57,21 +61,26 @@ public class Socket internal constructor(
         }
     }
 
-    public fun timeout(kind: Int): Long? =
-        when (kind) {
+    public fun timeout(kind: Int): Long? {
+        return when (kind) {
             SO_RCVTIMEO -> readTimeoutMs
             SO_SNDTIMEO -> writeTimeoutMs
             else -> null
         }
+    }
 
     public fun close() {
         isClosed = true
     }
 
-    public fun isClosed(): Boolean = isClosed
+    public fun isClosed(): Boolean {
+        return isClosed
+    }
 
     public companion object {
-        public fun new(): Socket = Socket(1L)
+        public fun new(): Socket {
+            return Socket(1L)
+        }
     }
 }
 

@@ -1,22 +1,30 @@
-// port-lint: source uds_windows/src/stdnet/net.rs
+// port-lint: source stdnet/net.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 public class AcceptedConnection(
     public val stream: UnixStream,
     public val addr: SocketAddr,
 ) {
-    public operator fun component1(): UnixStream = stream
+    public operator fun component1(): UnixStream {
+        return stream
+    }
 
-    public operator fun component2(): SocketAddr = addr
+    public operator fun component2(): SocketAddr {
+        return addr
+    }
 }
 
 public class AcceptedStreamPair(
     public val first: UnixStream,
     public val second: UnixStream,
 ) {
-    public operator fun component1(): UnixStream = first
+    public operator fun component1(): UnixStream {
+        return first
+    }
 
-    public operator fun component2(): UnixStream = second
+    public operator fun component2(): UnixStream {
+        return second
+    }
 }
 
 internal class BytePipe {
@@ -46,7 +54,9 @@ internal class BytePipe {
         isClosed = true
     }
 
-    fun available(): Int = buffer.size
+    fun available(): Int {
+        return buffer.size
+    }
 }
 
 internal class SocketRegistry {
@@ -60,7 +70,9 @@ internal class SocketRegistry {
         listeners.remove(path)
     }
 
-    fun lookup(path: String): UnixListener? = listeners[path]
+    fun lookup(path: String): UnixListener? {
+        return listeners[path]
+    }
 }
 
 internal val globalSocketRegistry = SocketRegistry()
@@ -75,24 +87,31 @@ public class UnixStream internal constructor(
     private val localAddress: SocketAddr,
     private val peerAddress: SocketAddr,
 ) {
-    public fun tryClone(): UnixStream =
-        UnixStream(
+    public fun tryClone(): UnixStream {
+        return UnixStream(
             socket = socket.duplicate(),
             inPipe = inPipe,
             outPipe = outPipe,
             localAddress = localAddress,
             peerAddress = peerAddress,
         )
+    }
 
-    public fun localAddr(): SocketAddr = localAddress
+    public fun localAddr(): SocketAddr {
+        return localAddress
+    }
 
-    public fun peerAddr(): SocketAddr = peerAddress
+    public fun peerAddr(): SocketAddr {
+        return peerAddress
+    }
 
     public fun setNonblocking(nonblocking: Boolean) {
         socket.setNonblocking(nonblocking)
     }
 
-    public fun takeError(): SocketError? = socket.takeError()
+    public fun takeError(): SocketError? {
+        return socket.takeError()
+    }
 
     public fun shutdown(how: Shutdown) {
         socket.shutdown(how)
@@ -114,15 +133,21 @@ public class UnixStream internal constructor(
         socket.setTimeout(durationMs, SO_SNDTIMEO)
     }
 
-    public fun readTimeout(): Long? = socket.timeout(SO_RCVTIMEO)
+    public fun readTimeout(): Long? {
+        return socket.timeout(SO_RCVTIMEO)
+    }
 
-    public fun writeTimeout(): Long? = socket.timeout(SO_SNDTIMEO)
+    public fun writeTimeout(): Long? {
+        return socket.timeout(SO_SNDTIMEO)
+    }
 
-    public fun read(buf: ByteArray, offset: Int = 0, length: Int = buf.size): Int =
-        inPipe.read(buf, offset, length)
+    public fun read(buf: ByteArray, offset: Int = 0, length: Int = buf.size): Int {
+        return inPipe.read(buf, offset, length)
+    }
 
-    public fun write(buf: ByteArray, offset: Int = 0, length: Int = buf.size): Int =
-        outPipe.write(buf, offset, length)
+    public fun write(buf: ByteArray, offset: Int = 0, length: Int = buf.size): Int {
+        return outPipe.write(buf, offset, length)
+    }
 
     public fun writeAll(buf: ByteArray) {
         var written = 0
@@ -209,8 +234,8 @@ public class UnixListener internal constructor(
         incomingQueue.add(connection)
     }
 
-    public fun accept(): AcceptedConnection =
-        if (incomingQueue.isEmpty()) {
+    public fun accept(): AcceptedConnection {
+        return if (incomingQueue.isEmpty()) {
             val clientIn = BytePipe()
             val clientOut = BytePipe()
             val clientAddr = fromPath("")
@@ -226,23 +251,31 @@ public class UnixListener internal constructor(
         } else {
             incomingQueue.removeAt(0)
         }
+    }
 
-    public fun tryClone(): UnixListener =
-        UnixListener(
+    public fun tryClone(): UnixListener {
+        return UnixListener(
             socket = socket.duplicate(),
             boundAddress = boundAddress,
             boundPath = boundPath,
         )
+    }
 
-    public fun localAddr(): SocketAddr = boundAddress
+    public fun localAddr(): SocketAddr {
+        return boundAddress
+    }
 
     public fun setNonblocking(nonblocking: Boolean) {
         socket.setNonblocking(nonblocking)
     }
 
-    public fun takeError(): SocketError? = socket.takeError()
+    public fun takeError(): SocketError? {
+        return socket.takeError()
+    }
 
-    public fun incoming(): Incoming = Incoming(this)
+    public fun incoming(): Incoming {
+        return Incoming(this)
+    }
 
     public fun close() {
         socket.close()
@@ -267,12 +300,16 @@ public class Incoming(
     private val listener: UnixListener,
 ) : Iterator<AcceptedConnection>,
     Sequence<AcceptedConnection> {
-    override fun hasNext(): Boolean = true
+    override fun hasNext(): Boolean {
+        return true
+    }
 
     override fun next(): AcceptedConnection {
         if (!hasNext()) throw NoSuchElementException("No more incoming connections")
         return listener.accept()
     }
 
-    override fun iterator(): Iterator<AcceptedConnection> = this
+    override fun iterator(): Iterator<AcceptedConnection> {
+        return this
+    }
 }
