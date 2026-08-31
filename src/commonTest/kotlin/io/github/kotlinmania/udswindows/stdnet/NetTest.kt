@@ -1,4 +1,4 @@
-// port-lint: tests uds_windows/src/stdnet/net.rs
+// port-lint: tests stdnet/net.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 import kotlin.test.Test
@@ -112,8 +112,11 @@ class NetTest {
         }
     }
 
-    private fun tmpdir(): String = "/tmp/test_sock_${randomSuffix()}"
+    private fun tmpdir(): String {
+        return "/tmp/test_sock_${randomSuffix()}"
+    }
 
-    private fun randomSuffix(): String =
-        (1..100000).random().toString()
+    private fun randomSuffix(): String {
+        return (1..100000).random().toString()
+    }
 }

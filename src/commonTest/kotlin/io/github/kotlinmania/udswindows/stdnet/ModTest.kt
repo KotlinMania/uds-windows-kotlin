@@ -1,4 +1,3 @@
-// port-lint: tests uds_windows/src/stdnet/mod.rs
 package io.github.kotlinmania.udswindows.stdnet
 
 import kotlin.test.Test
