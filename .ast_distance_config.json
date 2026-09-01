@@ -17,7 +17,11 @@
   },
   "reexport_modules": [
     "lib",
+    "lib.rs",
+    "uds_windows/src/lib.rs",
     "stdnet/mod",
-    "stdnet.mod"
+    "stdnet.mod",
+    "stdnet/mod.rs",
+    "uds_windows/src/stdnet/mod.rs"
   ]
 }
