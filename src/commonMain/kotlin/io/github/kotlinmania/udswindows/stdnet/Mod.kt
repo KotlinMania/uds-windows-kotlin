@@ -11,15 +11,12 @@ internal class SockaddrUn(
 ) {
     val sunPath: ByteArray = sunPath.copyOf(SUN_PATH_LENGTH)
 
-    override fun equals(other: Any?): Boolean {
-        return other is SockaddrUn &&
+    override fun equals(other: Any?): Boolean =
+        other is SockaddrUn &&
             sunFamily == other.sunFamily &&
             sunPath.contentEquals(other.sunPath)
-    }
 
-    override fun hashCode(): Int {
-        return 31 * sunFamily + sunPath.contentHashCode()
-    }
+    override fun hashCode(): Int = 31 * sunFamily + sunPath.contentHashCode()
 
     override fun toString(): String {
         val path = decodeSunPath()
@@ -32,9 +29,7 @@ internal class SockaddrUn(
     }
 }
 
-internal fun sunPathOffset(addr: SockaddrUn): Int {
-    return SUN_PATH_OFFSET
-}
+internal fun sunPathOffset(addr: SockaddrUn): Int = SUN_PATH_OFFSET
 
 internal fun sockaddrUn(path: String): Pair<SockaddrUn, Int> {
     if (path.contains('\u0000')) {
@@ -72,29 +67,19 @@ public class WindowsSocketException(
     message: String = "Windows socket error: $rawOsError",
 ) : RuntimeException(message)
 
-internal fun lastError(code: Int = -1): WindowsSocketException {
-    return WindowsSocketException(code, "Windows socket error: $code")
-}
+internal fun lastError(code: Int = -1): WindowsSocketException = WindowsSocketException(code, "Windows socket error: $code")
 
 internal interface IsMinusOne {
     fun isMinusOne(): Boolean
 }
 
-internal fun Byte.isMinusOne(): Boolean {
-    return this == (-1).toByte()
-}
+internal fun Byte.isMinusOne(): Boolean = this == (-1).toByte()
 
-internal fun Short.isMinusOne(): Boolean {
-    return this == (-1).toShort()
-}
+internal fun Short.isMinusOne(): Boolean = this == (-1).toShort()
 
-internal fun Int.isMinusOne(): Boolean {
-    return this == -1
-}
+internal fun Int.isMinusOne(): Boolean = this == -1
 
-internal fun Long.isMinusOne(): Boolean {
-    return this == -1L
-}
+internal fun Long.isMinusOne(): Boolean = this == -1L
 
 internal fun cvt(t: Byte): Byte {
     if (t.isMinusOne()) {
@@ -140,13 +125,9 @@ internal sealed class AddressKind {
     ) : AddressKind() {
         val name: ByteArray = name.copyOf()
 
-        override fun equals(other: Any?): Boolean {
-            return other is Abstract && name.contentEquals(other.name)
-        }
+        override fun equals(other: Any?): Boolean = other is Abstract && name.contentEquals(other.name)
 
-        override fun hashCode(): Int {
-            return name.contentHashCode()
-        }
+        override fun hashCode(): Int = name.contentHashCode()
     }
 }
 
@@ -154,9 +135,7 @@ public class SocketAddr internal constructor(
     internal val addr: SockaddrUn,
     internal val len: Int,
 ) {
-    public fun isUnnamed(): Boolean {
-        return address() is AddressKind.Unnamed
-    }
+    public fun isUnnamed(): Boolean = address() is AddressKind.Unnamed
 
     public fun asPathname(): String? {
         val kind = address()
@@ -190,17 +169,14 @@ public class SocketAddr internal constructor(
         return addr.sunPath.contentEquals(other.addr.sunPath)
     }
 
-    override fun hashCode(): Int {
-        return 31 * len + addr.hashCode()
-    }
+    override fun hashCode(): Int = 31 * len + addr.hashCode()
 
-    override fun toString(): String {
-        return when (val kind = address()) {
+    override fun toString(): String =
+        when (val kind = address()) {
             AddressKind.Unnamed -> "(unnamed)"
             is AddressKind.Abstract -> "${AsciiEscaped(kind.name)} (abstract)"
             is AddressKind.Pathname -> "\"${kind.path}\" (pathname)"
         }
-    }
 
     public companion object {
         internal fun new(f: (SockaddrUn, IntArray) -> Int): SocketAddr {
@@ -223,9 +199,7 @@ public class SocketAddr internal constructor(
     }
 }
 
-internal fun fromSockaddrUn(addr: SockaddrUn, len: Int): SocketAddr {
-    return SocketAddr.fromParts(addr, len)
-}
+internal fun fromSockaddrUn(addr: SockaddrUn, len: Int): SocketAddr = SocketAddr.fromParts(addr, len)
 
 public fun fromPath(path: String): SocketAddr {
     val pair = sockaddrUn(path)
@@ -235,15 +209,14 @@ public fun fromPath(path: String): SocketAddr {
 private class AsciiEscaped(
     private val bytes: ByteArray,
 ) {
-    override fun toString(): String {
-        return buildString {
+    override fun toString(): String =
+        buildString {
             append('"')
             for (byte in bytes) {
                 append(byte.asciiEscapeDefault())
             }
             append('"')
         }
-    }
 }
 
 private fun Byte.asciiEscapeDefault(): String {
