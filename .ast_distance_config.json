@@ -2,7 +2,7 @@
   "type": "port",
   "name": "uds-windows-kotlin",
   "source": {
-    "path": "tmp",
+    "path": "tmp/uds_windows/src",
     "lang": "rust"
   },
   "target": {
