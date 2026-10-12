@@ -70,8 +70,25 @@ public class Socket internal constructor(
 
     public fun isClosed(): Boolean = isClosed
 
+    public fun asRawSocket(): Long = rawSocket
+
+    public fun intoRawSocket(): Long {
+        val raw = rawSocket
+        close()
+        return raw
+    }
+
+    override fun equals(other: Any?): Boolean =
+        other is Socket && rawSocket == other.rawSocket
+
+    override fun hashCode(): Int = rawSocket.hashCode()
+
+    override fun toString(): String = "Socket(rawSocket=$rawSocket, isClosed=$isClosed)"
+
     public companion object {
         public fun new(): Socket = Socket(1L)
+
+        public fun fromRawSocket(rawSocket: Long): Socket = Socket(rawSocket)
     }
 }
 

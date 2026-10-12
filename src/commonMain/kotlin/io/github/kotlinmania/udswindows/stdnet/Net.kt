@@ -8,6 +8,13 @@ public class AcceptedConnection(
     public operator fun component1(): UnixStream = stream
 
     public operator fun component2(): SocketAddr = addr
+
+    override fun equals(other: Any?): Boolean =
+        other is AcceptedConnection && stream == other.stream && addr == other.addr
+
+    override fun hashCode(): Int = 31 * stream.hashCode() + addr.hashCode()
+
+    override fun toString(): String = "AcceptedConnection(stream=$stream, addr=$addr)"
 }
 
 public class AcceptedStreamPair(
@@ -17,6 +24,13 @@ public class AcceptedStreamPair(
     public operator fun component1(): UnixStream = first
 
     public operator fun component2(): UnixStream = second
+
+    override fun equals(other: Any?): Boolean =
+        other is AcceptedStreamPair && first == other.first && second == other.second
+
+    override fun hashCode(): Int = 31 * first.hashCode() + second.hashCode()
+
+    override fun toString(): String = "AcceptedStreamPair(first=$first, second=$second)"
 }
 
 internal class BytePipe {
@@ -74,7 +88,7 @@ public class UnixStream internal constructor(
     private val outPipe: BytePipe,
     private val localAddress: SocketAddr,
     private val peerAddress: SocketAddr,
-) {
+) : UnixStreamExt {
     public fun tryClone(): UnixStream =
         UnixStream(
             socket = socket.duplicate(),
@@ -145,6 +159,20 @@ public class UnixStream internal constructor(
         return total
     }
 
+    public fun flush() {
+        check(!socket.isClosed()) { "cannot flush a closed stream" }
+    }
+
+    public fun asRawSocket(): Long = socket.asRawSocket()
+
+    public fun intoRawSocket(): Long = socket.intoRawSocket()
+
+    override fun connectComplete() {
+        // setsockopt SO_UPDATE_CONNECT_CONTEXT shim for Windows UDS
+    }
+
+    override fun toString(): String = "UnixStream(localAddress=$localAddress, peerAddress=$peerAddress)"
+
     public fun close() {
         socket.close()
         inPipe.close()
@@ -152,6 +180,15 @@ public class UnixStream internal constructor(
     }
 
     public companion object {
+        public fun fromRawSocket(rawSocket: Long): UnixStream {
+            init()
+            val s = Socket.fromRawSocket(rawSocket)
+            val inPipe = BytePipe()
+            val outPipe = BytePipe()
+            val addr = fromPath("")
+            return UnixStream(s, inPipe, outPipe, addr, addr)
+        }
+
         public fun connect(path: String): UnixStream {
             init()
             val socketAddr = fromPath(path)
@@ -200,7 +237,7 @@ public class UnixListener internal constructor(
     internal val socket: Socket,
     private val boundAddress: SocketAddr,
     private val boundPath: String,
-) {
+) : UnixListenerExt {
     private val incomingQueue = mutableListOf<AcceptedConnection>()
 
     internal fun enqueueIncoming(connection: AcceptedConnection) {
@@ -242,12 +279,29 @@ public class UnixListener internal constructor(
 
     public fun incoming(): Incoming = Incoming(this)
 
+    public fun asRawSocket(): Long = socket.asRawSocket()
+
+    public fun intoRawSocket(): Long = socket.intoRawSocket()
+
+    override fun acceptComplete(socket: UnixStream) {
+        // setsockopt SO_UPDATE_ACCEPT_CONTEXT shim for Windows UDS
+    }
+
+    override fun toString(): String = "UnixListener(boundAddress=$boundAddress, boundPath=$boundPath)"
+
     public fun close() {
         socket.close()
         globalSocketRegistry.unregister(boundPath)
     }
 
     public companion object {
+        public fun fromRawSocket(rawSocket: Long): UnixListener {
+            init()
+            val s = Socket.fromRawSocket(rawSocket)
+            val addr = fromPath("")
+            return UnixListener(s, addr, "")
+        }
+
         public fun bind(path: String): UnixListener {
             init()
             val addr = fromPath(path)
@@ -271,6 +325,10 @@ public class Incoming(
         if (!hasNext()) throw NoSuchElementException("No more incoming connections")
         return listener.accept()
     }
+
+    public fun sizeHint(): Pair<Long, Long?> = Pair(Long.MAX_VALUE, null)
+
+    override fun toString(): String = "Incoming(listener=$listener)"
 
     override fun iterator(): Iterator<AcceptedConnection> = this
 }

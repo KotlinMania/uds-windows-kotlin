@@ -112,6 +112,52 @@ class NetTest {
         }
     }
 
+    @Test
+    fun rawSocketConversions() {
+        val raw = 42L
+        val socket = Socket.fromRawSocket(raw)
+        assertEquals(raw, socket.asRawSocket())
+        assertEquals(raw, socket.intoRawSocket())
+        assertTrue(socket.isClosed())
+
+        val stream = UnixStream.fromRawSocket(101L)
+        assertEquals(101L, stream.asRawSocket())
+        stream.flush()
+        stream.connectComplete()
+        assertEquals(101L, stream.intoRawSocket())
+
+        val listener = UnixListener.fromRawSocket(202L)
+        assertEquals(202L, listener.asRawSocket())
+        listener.acceptComplete(stream)
+        assertEquals(202L, listener.intoRawSocket())
+    }
+
+    @Test
+    fun incomingSizeHintAndFormatting() {
+        val socketPath = "/tmp/test_sock_incoming_${randomSuffix()}"
+        val listener = UnixListener.bind(socketPath)
+        val incoming = listener.incoming()
+        val (lower, upper) = incoming.sizeHint()
+        assertEquals(Long.MAX_VALUE, lower)
+        assertEquals(null, upper)
+        assertTrue(incoming.toString().contains("Incoming"))
+        listener.close()
+    }
+
+    @Test
+    fun acceptAddrsExtensions() {
+        val buf = AcceptAddrsBuf.new()
+        val socketPath = "/tmp/test_sock_addrs_${randomSuffix()}"
+        val listener = UnixListener.bind(socketPath)
+        val parsed = buf.parse(listener)
+        assertNotNull(parsed.local())
+        assertNotNull(parsed.remote())
+        assertTrue(buf.toString().contains("AcceptAddrsBuf"))
+        assertTrue(parsed.toString().contains("AcceptAddrs"))
+        assertEquals(buf, AcceptAddrsBuf.new())
+        listener.close()
+    }
+
     private fun tmpdir(): String = "/tmp/test_sock_${randomSuffix()}"
 
     private fun randomSuffix(): String = (1..100000).random().toString()
