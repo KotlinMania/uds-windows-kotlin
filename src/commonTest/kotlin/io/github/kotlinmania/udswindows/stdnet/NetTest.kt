@@ -27,7 +27,6 @@ class NetTest {
         assertTrue(msg1.contentEquals(buf))
 
         serverStream.write(msg2)
-        val buf2 = mutableListOf<Byte>()
         val readBytes = ByteArray(6)
         val n2 = stream.read(readBytes)
         assertEquals(6, n2)
@@ -157,8 +156,6 @@ class NetTest {
         assertEquals(buf, AcceptAddrsBuf.new())
         listener.close()
     }
-
-    private fun tmpdir(): String = "/tmp/test_sock_${randomSuffix()}"
 
     private fun randomSuffix(): String = (1..100000).random().toString()
 }

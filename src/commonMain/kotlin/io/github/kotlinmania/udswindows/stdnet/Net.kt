@@ -111,8 +111,14 @@ public class UnixStream internal constructor(
     public fun shutdown(how: Shutdown) {
         socket.shutdown(how)
         when (how) {
-            Shutdown.Read -> inPipe.close()
-            Shutdown.Write -> outPipe.close()
+            Shutdown.Read -> {
+                inPipe.close()
+            }
+
+            Shutdown.Write -> {
+                outPipe.close()
+            }
+
             Shutdown.Both -> {
                 inPipe.close()
                 outPipe.close()
