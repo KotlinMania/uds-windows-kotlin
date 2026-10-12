@@ -11,6 +11,17 @@ public class AcceptAddrsBuf {
             remote = remoteAddr ?: fromPath(""),
         )
 
+    override fun equals(other: Any?): Boolean =
+        other is AcceptAddrsBuf &&
+            localAddr == other.localAddr &&
+            remoteAddr == other.remoteAddr
+
+    override fun hashCode(): Int =
+        31 * (localAddr?.hashCode() ?: 0) + (remoteAddr?.hashCode() ?: 0)
+
+    override fun toString(): String =
+        "AcceptAddrsBuf(local=$localAddr, remote=$remoteAddr)"
+
     public companion object {
         public fun new(): AcceptAddrsBuf = AcceptAddrsBuf()
     }
@@ -23,6 +34,17 @@ public class AcceptAddrs internal constructor(
     public fun local(): SocketAddr? = local
 
     public fun remote(): SocketAddr? = remote
+
+    override fun equals(other: Any?): Boolean =
+        other is AcceptAddrs &&
+            local == other.local &&
+            remote == other.remote
+
+    override fun hashCode(): Int =
+        31 * (local?.hashCode() ?: 0) + (remote?.hashCode() ?: 0)
+
+    override fun toString(): String =
+        "AcceptAddrs(local=$local, remote=$remote)"
 }
 
 public interface UnixStreamExt {
