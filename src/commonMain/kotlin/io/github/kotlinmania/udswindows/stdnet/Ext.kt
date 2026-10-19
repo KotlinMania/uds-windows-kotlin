@@ -37,7 +37,7 @@ public class AcceptAddrsBuf {
 
     public fun default(): AcceptAddrsBuf = AcceptAddrsBuf()
 
-    public fun args(): Array<Any> = arrayOf(this, 0, 128, 128)
+    internal fun args(): Array<Any> = arrayOf(this, 0, 128, 128)
 
     /**
      * Parses the data contained in this address buffer, returning the parsed
@@ -125,15 +125,15 @@ public class WsaExtension(
     }
 }
 
-public interface NetInt<T> {
+internal interface NetInt<T> {
     public fun fromBe(i: T): T
 
     public fun toBe(): T
 }
 
-public typealias ConnectEx = (Long, SockaddrUn, Int, ByteArray?, Long, LongArray, OVERLAPPED?) -> Int
-public typealias AcceptEx = (Long, Long, ByteArray, Long, Long, Long, LongArray, OVERLAPPED?) -> Int
-public typealias GetAcceptExSockaddrs = (ByteArray, Long, Long, Long, Array<SockaddrUn?>, IntArray, Array<SockaddrUn?>, IntArray) -> Unit
+internal typealias ConnectEx = (Long, SockaddrUn, Int, ByteArray?, Long, LongArray, OVERLAPPED?) -> Int
+internal typealias AcceptEx = (Long, Long, ByteArray, Long, Long, Long, LongArray, OVERLAPPED?) -> Int
+internal typealias GetAcceptExSockaddrs = (ByteArray, Long, Long, Long, Array<SockaddrUn?>, IntArray, Array<SockaddrUn?>, IntArray) -> Unit
 
 public fun lastErr(): Long? = null
 
@@ -225,11 +225,11 @@ public fun writeOverlapped(stream: UnixStream, buf: ByteArray, overlapped: OVERL
 public fun connectOverlapped(stream: UnixStream, addr: SocketAddr, buf: ByteArray, overlapped: OVERLAPPED?): Long? =
     stream.connectOverlapped(addr, buf, overlapped)
 
-public fun connectComplete(stream: UnixStream): Unit =
+public fun connectComplete(stream: UnixStreamExt): Unit =
     stream.connectComplete()
 
 public fun acceptOverlapped(listener: UnixListener, socket: UnixStream, addrs: AcceptAddrsBuf, overlapped: OVERLAPPED?): Boolean =
     listener.acceptOverlapped(socket, addrs, overlapped)
 
-public fun acceptComplete(listener: UnixListener, socket: UnixStream): Unit =
+public fun acceptComplete(listener: UnixListenerExt, socket: UnixStream): Unit =
     listener.acceptComplete(socket)

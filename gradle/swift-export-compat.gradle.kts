@@ -19,7 +19,10 @@ object SwiftExportCompatibility {
     fun bridges(source: String): String =
         // Consume the already evaluated result while preserving the Boolean ABI.
         // Unlike a bare expression statement, let also accepts a nullable result.
-        source.replace("run { _result; true }", "_result.let { true }")
+        source
+            .replace("run { _result; true }", "_result.let { true }")
+            // Reverse Void bridges consume an already evaluated Boolean.
+            .replace("run<Unit> { _result }", "_result.let { }")
 
     fun coroutineRuntime(source: String): String {
         val hash = sha256(source)

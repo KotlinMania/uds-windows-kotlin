@@ -76,6 +76,40 @@ class SocketAddrTest {
     fun cvtThrowsOnSocketError() {
         val thrown = assertFailsWith<WindowsSocketException> { cvt(-1) }
         assertEquals(-1, thrown.rawOsError)
+        assertEquals("Windows socket error: -1", thrown.message)
+    }
+
+    @Test
+    fun conversionSentinelsKeepTheirErrorCodes() {
+        val failures =
+            listOf(
+                assertFailsWith<WindowsSocketException> { cvt((-1).toByte()) },
+                assertFailsWith<WindowsSocketException> { cvt((-1).toShort()) },
+                assertFailsWith<WindowsSocketException> { cvt(-1L) },
+            )
+        failures.forEach { failure ->
+            assertEquals(-1, failure.rawOsError)
+            assertEquals("Windows socket error: -1", failure.message)
+        }
+        val zero = assertFailsWith<WindowsSocketException> { cvtZ(0) }
+        assertEquals(0, zero.rawOsError)
+        assertEquals("Windows socket error: 0", zero.message)
+        assertEquals(1, cvtZ(1))
+    }
+
+    @Test
+    fun addressInitializationPropagatesSocketFailureOnce() {
+        var calls = 0
+        val failure =
+            assertFailsWith<WindowsSocketException> {
+                SocketAddr.new { _, _ ->
+                    calls++
+                    -1
+                }
+            }
+        assertEquals(1, calls)
+        assertEquals(-1, failure.rawOsError)
+        assertEquals("Windows socket error: -1", failure.message)
     }
 
     @Test

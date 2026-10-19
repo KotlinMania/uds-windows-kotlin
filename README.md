@@ -56,9 +56,21 @@ http://opensource.org/licenses/MIT).
 
 ```kotlin
 dependencies {
-    implementation("io.github.kotlinmania:uds-windows-kotlin:0.1.0")
+    implementation("io.github.kotlinmania:uds-windows-kotlin:0.2.1")
 }
 ```
+
+### Swift extension callbacks
+
+Swift implementations of `UnixStreamExt` and `UnixListenerExt` inherit from
+`SocketExtension`. Pass those implementations to `connectComplete` and
+`acceptComplete` to dispatch completion callbacks from Kotlin into Swift.
+
+The first published API keeps native conversion helpers and
+`WindowsSocketException` internal. Conversion failures still throw a
+`RuntimeException` with their existing messages. `SocketError` exposes an error
+code and message as a value; constructing one does not retrieve an operating
+system error, and `takeError()` currently returns `null`.
 
 ### Building
 
@@ -79,7 +91,7 @@ dependencies {
 
 ### Porting guidelines
 
-See [AGENTS.md](AGENTS.md) and [CLAUDE.md](CLAUDE.md) for translator discipline, port-lint header convention, and Rust → Kotlin idiom mapping.
+See [AGENTS.md](AGENTS.md) for translator discipline, port-lint header convention, and Rust → Kotlin idiom mapping.
 
 ### License
 
