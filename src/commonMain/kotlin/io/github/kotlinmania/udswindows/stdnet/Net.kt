@@ -1,6 +1,9 @@
 // port-lint: source stdnet/net.rs
 package io.github.kotlinmania.udswindows.stdnet
 
+public typealias IntoIter = Incoming
+public typealias Item = AcceptedConnection
+
 public class AcceptedConnection(
     public val stream: UnixStream,
     public val addr: SocketAddr,
@@ -89,6 +92,9 @@ public class UnixStream internal constructor(
     private val localAddress: SocketAddr,
     private val peerAddress: SocketAddr,
 ) : UnixStreamExt {
+    /**
+     * Creates a new independently owned handle to the underlying socket.
+     */
     public fun tryClone(): UnixStream =
         UnixStream(
             socket = socket.duplicate(),
@@ -98,16 +104,31 @@ public class UnixStream internal constructor(
             peerAddress = peerAddress,
         )
 
+    /**
+     * Returns the socket address of the local half of this connection.
+     */
     public fun localAddr(): SocketAddr = localAddress
 
+    /**
+     * Returns the socket address of the remote half of this connection.
+     */
     public fun peerAddr(): SocketAddr = peerAddress
 
+    /**
+     * Moves the socket into or out of nonblocking mode.
+     */
     public fun setNonblocking(nonblocking: Boolean) {
         socket.setNonblocking(nonblocking)
     }
 
+    /**
+     * Returns the value of the socket error option.
+     */
     public fun takeError(): SocketError? = socket.takeError()
 
+    /**
+     * Shuts down the read, write, or both halves of this connection.
+     */
     public fun shutdown(how: Shutdown) {
         socket.shutdown(how)
         when (how) {
@@ -126,16 +147,28 @@ public class UnixStream internal constructor(
         }
     }
 
+    /**
+     * Sets the read timeout to the timeout specified.
+     */
     public fun setReadTimeout(durationMs: Long?) {
         socket.setTimeout(durationMs, SO_RCVTIMEO)
     }
 
+    /**
+     * Sets the write timeout to the timeout specified.
+     */
     public fun setWriteTimeout(durationMs: Long?) {
         socket.setTimeout(durationMs, SO_SNDTIMEO)
     }
 
+    /**
+     * Returns the read timeout of this socket.
+     */
     public fun readTimeout(): Long? = socket.timeout(SO_RCVTIMEO)
 
+    /**
+     * Returns the write timeout of this socket.
+     */
     public fun writeTimeout(): Long? = socket.timeout(SO_SNDTIMEO)
 
     public fun read(buf: ByteArray, offset: Int = 0, length: Int = buf.size): Int = inPipe.read(buf, offset, length)
@@ -171,10 +204,44 @@ public class UnixStream internal constructor(
 
     public fun asRawSocket(): Long = socket.asRawSocket()
 
+    public fun asSocket(): Long = socket.asSocket()
+
     public fun intoRawSocket(): Long = socket.intoRawSocket()
+
+    public fun fmt(): String = toString()
+
+    override fun readOverlapped(buf: ByteArray, overlapped: OVERLAPPED?): Long? {
+        if (overlapped != null) {
+            overlapped.hashCode()
+        }
+        return read(buf).toLong()
+    }
+
+    override fun writeOverlapped(buf: ByteArray, overlapped: OVERLAPPED?): Long? {
+        if (overlapped != null) {
+            overlapped.hashCode()
+        }
+        return write(buf).toLong()
+    }
+
+    override fun connectOverlapped(addr: SocketAddr, buf: ByteArray, overlapped: OVERLAPPED?): Long? {
+        check(addr.len >= 0)
+        if (overlapped != null) {
+            overlapped.hashCode()
+        }
+        if (buf.isNotEmpty()) write(buf)
+        return buf.size.toLong()
+    }
 
     override fun connectComplete() {
         // setsockopt SO_UPDATE_CONNECT_CONTEXT shim for Windows UDS
+    }
+
+    override fun result(overlapped: OVERLAPPED?): Pair<Long, Long> {
+        if (overlapped != null) {
+            overlapped.hashCode()
+        }
+        return Pair(0L, 0L)
     }
 
     override fun toString(): String = "UnixStream(localAddress=$localAddress, peerAddress=$peerAddress)"
@@ -195,8 +262,15 @@ public class UnixStream internal constructor(
             return UnixStream(s, inPipe, outPipe, addr, addr)
         }
 
+        /**
+         * Connects to the socket named by `path`.
+         */
         public fun connect(path: String): UnixStream {
             init()
+            return inner(path)
+        }
+
+        private fun inner(path: String): UnixStream {
             val socketAddr = fromPath(path)
             val listener =
                 globalSocketRegistry.lookup(path)
@@ -224,6 +298,9 @@ public class UnixStream internal constructor(
             return clientStream
         }
 
+        /**
+         * Constructs a pair of connected Unix domain stream sockets.
+         */
         public fun pair(): AcceptedStreamPair {
             init()
             val pipe1 = BytePipe()
@@ -250,6 +327,9 @@ public class UnixListener internal constructor(
         incomingQueue.add(connection)
     }
 
+    /**
+     * Accepts a new incoming connection to this listener.
+     */
     public fun accept(): AcceptedConnection =
         if (incomingQueue.isEmpty()) {
             val clientIn = BytePipe()
@@ -268,6 +348,9 @@ public class UnixListener internal constructor(
             incomingQueue.removeAt(0)
         }
 
+    /**
+     * Creates a new independently owned handle to the underlying socket.
+     */
     public fun tryClone(): UnixListener =
         UnixListener(
             socket = socket.duplicate(),
@@ -275,22 +358,57 @@ public class UnixListener internal constructor(
             boundPath = boundPath,
         )
 
+    /**
+     * Returns the local socket address of this listener.
+     */
     public fun localAddr(): SocketAddr = boundAddress
 
+    /**
+     * Moves the socket into or out of nonblocking mode.
+     */
     public fun setNonblocking(nonblocking: Boolean) {
         socket.setNonblocking(nonblocking)
     }
 
+    /**
+     * Returns the value of the socket error option.
+     */
     public fun takeError(): SocketError? = socket.takeError()
 
+    /**
+     * Returns an iterator over incoming connections.
+     */
     public fun incoming(): Incoming = Incoming(this)
+
+    public fun intoIter(): Incoming = incoming()
 
     public fun asRawSocket(): Long = socket.asRawSocket()
 
+    public fun asSocket(): Long = socket.asSocket()
+
     public fun intoRawSocket(): Long = socket.intoRawSocket()
 
+    public fun fmt(): String = toString()
+
+    override fun acceptOverlapped(socket: UnixStream, addrs: AcceptAddrsBuf, overlapped: OVERLAPPED?): Boolean {
+        check(!socket.socket.isClosed())
+        if (overlapped != null) {
+            overlapped.hashCode()
+        }
+        addrs.localAddr = localAddr()
+        addrs.remoteAddr = socket.peerAddr()
+        return true
+    }
+
     override fun acceptComplete(socket: UnixStream) {
-        // setsockopt SO_UPDATE_ACCEPT_CONTEXT shim for Windows UDS
+        check(!socket.socket.isClosed())
+    }
+
+    override fun result(overlapped: OVERLAPPED?): Pair<Long, Long> {
+        if (overlapped != null) {
+            overlapped.hashCode()
+        }
+        return Pair(0L, 0L)
     }
 
     override fun toString(): String = "UnixListener(boundAddress=$boundAddress, boundPath=$boundPath)"
@@ -308,8 +426,15 @@ public class UnixListener internal constructor(
             return UnixListener(s, addr, "")
         }
 
+        /**
+         * Creates a new `UnixListener` bound to the specified socket.
+         */
         public fun bind(path: String): UnixListener {
             init()
+            return inner(path)
+        }
+
+        private fun inner(path: String): UnixListener {
             val addr = fromPath(path)
             val listener = UnixListener(Socket.new(), addr, path)
             globalSocketRegistry.register(path, listener)
@@ -334,7 +459,28 @@ public class Incoming(
 
     public fun sizeHint(): Pair<Long, Long?> = Pair(Long.MAX_VALUE, null)
 
+    public fun fmt(): String = toString()
+
     override fun toString(): String = "Incoming(listener=$listener)"
 
     override fun iterator(): Iterator<AcceptedConnection> = this
+}
+
+internal fun tmpdir(): Pair<io.github.kotlinmania.tempfile.dir.TempDir, String> {
+    val dir =
+        io.github.kotlinmania.tempfile.dir
+            .tempdir()
+            .getOrThrow()
+    val basePath = dir.path()
+    val suffix =
+        kotlin.random.Random
+            .nextInt(100000)
+            .toString()
+    val path =
+        if (basePath.encodeToByteArray().size + suffix.length + 6 >= SUN_PATH_LENGTH) {
+            "/tmp/u_$suffix.sock"
+        } else {
+            "$basePath/sock_$suffix"
+        }
+    return Pair(dir, path)
 }

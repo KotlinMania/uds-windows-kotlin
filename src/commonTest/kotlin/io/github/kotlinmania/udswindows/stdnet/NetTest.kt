@@ -1,6 +1,8 @@
 // port-lint: tests stdnet/net.rs
 package io.github.kotlinmania.udswindows.stdnet
 
+import io.github.kotlinmania.tempfile.dir.TempDir
+import io.github.kotlinmania.tempfile.dir.tempdir
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -8,9 +10,22 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class NetTest {
+    private fun tmpdir(): Pair<TempDir, String> {
+        val dir = tempdir().getOrThrow()
+        val basePath = dir.path()
+        val suffix = randomSuffix()
+        val path =
+            if (basePath.encodeToByteArray().size + suffix.length + 6 >= SUN_PATH_LENGTH) {
+                "/tmp/u_$suffix.sock"
+            } else {
+                "$basePath/sock_$suffix"
+            }
+        return Pair(dir, path)
+    }
+
     @Test
     fun basic() {
-        val socketPath = "/tmp/test_sock_basic_${randomSuffix()}"
+        val (dir, socketPath) = tmpdir()
         val msg1 = "hello".encodeToByteArray()
         val msg2 = "world!".encodeToByteArray()
 
@@ -35,11 +50,12 @@ class NetTest {
         listener.close()
         stream.close()
         serverStream.close()
+        dir.close()
     }
 
     @Test
     fun tryClone() {
-        val socketPath = "/tmp/test_sock_clone_${randomSuffix()}"
+        val (dir, socketPath) = tmpdir()
         val msg1 = "hello".encodeToByteArray()
         val msg2 = "world".encodeToByteArray()
 
@@ -66,11 +82,12 @@ class NetTest {
         stream.close()
         stream2.close()
         serverStream.close()
+        dir.close()
     }
 
     @Test
     fun iter() {
-        val socketPath = "/tmp/test_sock_iter_${randomSuffix()}"
+        val (dir, socketPath) = tmpdir()
         val listener = UnixListener.bind(socketPath)
 
         val stream1 = UnixStream.connect(socketPath)
@@ -86,12 +103,14 @@ class NetTest {
         listener.close()
         stream1.close()
         stream2.close()
+        dir.close()
     }
 
     @Test
     fun longPath() {
+        val dir = tempdir().getOrThrow()
         val longPath =
-            "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfa" +
+            "${dir.path()}/asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfa" +
                 "sasdfasdfasdasdfasdfasdfadfasdfasdfasdfasdfasdf"
         assertFailsWith<IllegalArgumentException> {
             UnixStream.connect(longPath)
@@ -99,6 +118,7 @@ class NetTest {
         assertFailsWith<IllegalArgumentException> {
             UnixListener.bind(longPath)
         }
+        dir.close()
     }
 
     @Test
@@ -123,17 +143,17 @@ class NetTest {
         assertEquals(101L, stream.asRawSocket())
         stream.flush()
         stream.connectComplete()
-        assertEquals(101L, stream.intoRawSocket())
 
         val listener = UnixListener.fromRawSocket(202L)
         assertEquals(202L, listener.asRawSocket())
         listener.acceptComplete(stream)
+        assertEquals(101L, stream.intoRawSocket())
         assertEquals(202L, listener.intoRawSocket())
     }
 
     @Test
     fun incomingSizeHintAndFormatting() {
-        val socketPath = "/tmp/test_sock_incoming_${randomSuffix()}"
+        val (dir, socketPath) = tmpdir()
         val listener = UnixListener.bind(socketPath)
         val incoming = listener.incoming()
         val (lower, upper) = incoming.sizeHint()
@@ -141,12 +161,13 @@ class NetTest {
         assertEquals(null, upper)
         assertTrue(incoming.toString().contains("Incoming"))
         listener.close()
+        dir.close()
     }
 
     @Test
     fun acceptAddrsExtensions() {
         val buf = AcceptAddrsBuf.new()
-        val socketPath = "/tmp/test_sock_addrs_${randomSuffix()}"
+        val (dir, socketPath) = tmpdir()
         val listener = UnixListener.bind(socketPath)
         val parsed = buf.parse(listener)
         assertNotNull(parsed.local())
@@ -155,6 +176,7 @@ class NetTest {
         assertTrue(parsed.toString().contains("AcceptAddrs"))
         assertEquals(buf, AcceptAddrsBuf.new())
         listener.close()
+        dir.close()
     }
 
     private fun randomSuffix(): String = (1..100000).random().toString()

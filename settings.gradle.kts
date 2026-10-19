@@ -16,3 +16,13 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "uds-windows-kotlin"
+
+val tempfileKotlinLocal = file("../tempfile-kotlin")
+if (tempfileKotlinLocal.exists()) {
+    includeBuild(tempfileKotlinLocal) {
+        dependencySubstitution {
+            substitute(module("io.github.kotlinmania:tempfile-kotlin"))
+                .using(project(":"))
+        }
+    }
+}

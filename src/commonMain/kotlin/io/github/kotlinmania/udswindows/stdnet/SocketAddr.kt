@@ -1,15 +1,14 @@
-// port-lint: source stdnet/mod.rs
 package io.github.kotlinmania.udswindows.stdnet
 
-internal const val AF_UNIX: Int = 1
-private const val SUN_PATH_LENGTH: Int = 108
+public const val AF_UNIX: Int = 1
+internal const val SUN_PATH_LENGTH: Int = 108
 internal const val SUN_PATH_OFFSET: Int = 2
 
-internal class SockaddrUn(
-    var sunFamily: Int = AF_UNIX,
+public class SockaddrUn(
+    public var sunFamily: Int = AF_UNIX,
     sunPath: ByteArray = ByteArray(SUN_PATH_LENGTH),
 ) {
-    val sunPath: ByteArray = sunPath.copyOf(SUN_PATH_LENGTH)
+    public val sunPath: ByteArray = sunPath.copyOf(SUN_PATH_LENGTH)
 
     override fun equals(other: Any?): Boolean =
         other is SockaddrUn &&
@@ -29,9 +28,11 @@ internal class SockaddrUn(
     }
 }
 
-internal fun sunPathOffset(addr: SockaddrUn): Int = SUN_PATH_OFFSET
+public typealias sockaddr_un = SockaddrUn
 
-internal fun sockaddrUn(path: String): Pair<SockaddrUn, Int> {
+public fun sunPathOffset(addr: SockaddrUn): Int = SUN_PATH_OFFSET
+
+public fun sockaddrUn(path: String): Pair<SockaddrUn, Int> {
     if (path.contains('\u0000')) {
         throw IllegalArgumentException("paths may not contain interior null bytes")
     }
@@ -57,31 +58,32 @@ internal fun sockaddrUn(path: String): Pair<SockaddrUn, Int> {
     return Pair(addr, len)
 }
 
-public data class SocketError(
-    val rawOsError: Int,
-    val message: String = "Windows socket error: $rawOsError",
-)
-
 public class WindowsSocketException(
     public val rawOsError: Int,
     message: String = "Windows socket error: $rawOsError",
 ) : RuntimeException(message)
 
-internal fun lastError(code: Int = -1): WindowsSocketException = WindowsSocketException(code, "Windows socket error: $code")
+public data class SocketError(
+    val rawOsError: Int,
+    val message: String = "Windows socket error: $rawOsError",
+)
 
-internal interface IsMinusOne {
-    fun isMinusOne(): Boolean
+public fun lastError(code: Int = -1): WindowsSocketException =
+    WindowsSocketException(code, "Windows socket error: $code")
+
+public interface IsMinusOne {
+    public fun isMinusOne(): Boolean
 }
 
-internal fun Byte.isMinusOne(): Boolean = this == (-1).toByte()
+public fun Byte.isMinusOne(): Boolean = this == (-1).toByte()
 
-internal fun Short.isMinusOne(): Boolean = this == (-1).toShort()
+public fun Short.isMinusOne(): Boolean = this == (-1).toShort()
 
-internal fun Int.isMinusOne(): Boolean = this == -1
+public fun Int.isMinusOne(): Boolean = this == -1
 
-internal fun Long.isMinusOne(): Boolean = this == -1L
+public fun Long.isMinusOne(): Boolean = this == -1L
 
-internal fun cvt(t: Byte): Byte {
+public fun cvt(t: Byte): Byte {
     if (t.isMinusOne()) {
         throw lastError(t.toInt())
     } else {
@@ -89,7 +91,7 @@ internal fun cvt(t: Byte): Byte {
     }
 }
 
-internal fun cvt(t: Short): Short {
+public fun cvt(t: Short): Short {
     if (t.isMinusOne()) {
         throw lastError(t.toInt())
     } else {
@@ -97,7 +99,7 @@ internal fun cvt(t: Short): Short {
     }
 }
 
-internal fun cvt(t: Int): Int {
+public fun cvt(t: Int): Int {
     if (t.isMinusOne()) {
         throw lastError(t)
     } else {
@@ -105,7 +107,7 @@ internal fun cvt(t: Int): Int {
     }
 }
 
-internal fun cvt(t: Long): Long {
+public fun cvt(t: Long): Long {
     if (t.isMinusOne()) {
         throw lastError(t.toInt())
     } else {
@@ -113,17 +115,17 @@ internal fun cvt(t: Long): Long {
     }
 }
 
-internal sealed class AddressKind {
-    data object Unnamed : AddressKind()
+public sealed class AddressKind {
+    public data object Unnamed : AddressKind()
 
-    data class Pathname(
-        val path: String,
+    public data class Pathname(
+        public val path: String,
     ) : AddressKind()
 
-    class Abstract(
+    public class Abstract(
         name: ByteArray,
     ) : AddressKind() {
-        val name: ByteArray = name.copyOf()
+        public val name: ByteArray = name.copyOf()
 
         override fun equals(other: Any?): Boolean = other is Abstract && name.contentEquals(other.name)
 
@@ -146,11 +148,11 @@ public class SocketAddr internal constructor(
         }
     }
 
-    internal fun address(): AddressKind {
+    public fun address(): AddressKind {
         val pathLen = len - sunPathOffset(addr)
         val path = addr.sunPath
 
-        if (pathLen == 0) {
+        if (pathLen <= 0) {
             return AddressKind.Unnamed
         } else if (addr.sunPath.isNotEmpty() && addr.sunPath[0] == 0.toByte()) {
             return AddressKind.Abstract(path.copyOfRange(1, pathLen))
@@ -179,14 +181,14 @@ public class SocketAddr internal constructor(
         }
 
     public companion object {
-        internal fun new(f: (SockaddrUn, IntArray) -> Int): SocketAddr {
+        public fun new(f: (SockaddrUn, IntArray) -> Int): SocketAddr {
             val addr = SockaddrUn()
             val len = intArrayOf(SUN_PATH_LENGTH)
             cvt(f(addr, len))
             return fromParts(addr, len[0])
         }
 
-        internal fun fromParts(addr: SockaddrUn, len: Int): SocketAddr {
+        public fun fromParts(addr: SockaddrUn, len: Int): SocketAddr {
             var actualLen = len
             if (actualLen == 0) {
                 actualLen = sunPathOffset(addr)
@@ -199,14 +201,14 @@ public class SocketAddr internal constructor(
     }
 }
 
-internal fun fromSockaddrUn(addr: SockaddrUn, len: Int): SocketAddr = SocketAddr.fromParts(addr, len)
+public fun fromSockaddrUn(addr: SockaddrUn, len: Int): SocketAddr = SocketAddr.fromParts(addr, len)
 
 public fun fromPath(path: String): SocketAddr {
     val pair = sockaddrUn(path)
     return SocketAddr.fromParts(pair.first, pair.second)
 }
 
-private class AsciiEscaped(
+internal class AsciiEscaped(
     private val bytes: ByteArray,
 ) {
     override fun toString(): String =
