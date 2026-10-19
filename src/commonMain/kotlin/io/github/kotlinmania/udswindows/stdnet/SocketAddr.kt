@@ -58,7 +58,7 @@ public fun sockaddrUn(path: String): Pair<SockaddrUn, Int> {
     return Pair(addr, len)
 }
 
-public class WindowsSocketException(
+internal class WindowsSocketException(
     public val rawOsError: Int,
     message: String = "Windows socket error: $rawOsError",
 ) : RuntimeException(message)
@@ -68,7 +68,7 @@ public data class SocketError(
     val message: String = "Windows socket error: $rawOsError",
 )
 
-public fun lastError(code: Int = -1): WindowsSocketException =
+internal fun lastError(code: Int = -1): WindowsSocketException =
     WindowsSocketException(code, "Windows socket error: $code")
 
 public interface IsMinusOne {
