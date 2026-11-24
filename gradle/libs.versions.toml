@@ -1,10 +1,10 @@
 [versions]
-kotlin = "2.4.20"
+kotlin = "2.4.21"
 coroutines = "1.11.0"
-serialization = "1.11.0"
+serialization = "1.13.0"
 datetime = "0.8.0"
 collectionsImmutable = "0.5.2"
-androidKmp = "9.4.1"
+androidKmp = "9.5.2"
 detekt = "2.0.0-alpha.6"
 ktlint = "14.2.0"
 ktlintEngine = "1.8.0"
@@ -12,14 +12,19 @@ kotlinxBenchmark = "0.5.0"
 winapi = "0.1.0"
 tempfile = "0.1.1"
 
+androidxTestRunner = "1.7.0"
+
+rustLang = "0.3.0"
+
 [plugins]
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidKmp" }
+android-kmp = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidKmp" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-android-kmp = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidKmp" }
-detekt = { id = "dev.detekt", version.ref = "detekt" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 kotlinx-benchmark = { id = "org.jetbrains.kotlinx.benchmark", version.ref = "kotlinxBenchmark" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
+detekt = { id = "dev.detekt", version.ref = "detekt" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -31,13 +36,18 @@ kotlinx-benchmark-runtime = { module = "org.jetbrains.kotlinx:kotlinx-benchmark-
 winapi-kotlin = { module = "io.github.kotlinmania:winapi-kotlin", version.ref = "winapi" }
 tempfile-kotlin = { module = "io.github.kotlinmania:tempfile-kotlin", version.ref = "tempfile" }
 
+androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
+
+rust-lang-kotlin = { module = "io.github.kotlinmania:rust-lang-kotlin", version.ref = "rustLang" }
+
 [bundles]
 uds-windows-commonMain = [
   "kotlinx-coroutines-core",
-  "kotlinx-serialization-core",
-  "kotlinx-serialization-json",
   "kotlinx-datetime",
   "collections-immutable",
   "winapi-kotlin",
   "tempfile-kotlin",
+]
+rust-lang-commonMain = [
+  "rust-lang-kotlin",
 ]
